@@ -1,0 +1,20 @@
+# logging:
+#  level:
+#    org.zalando.logbook: TRACE
+
+spring:
+  application:
+    name: logging-spring-webflux
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info, health, metrics
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      atlas:
+        enabled: false
