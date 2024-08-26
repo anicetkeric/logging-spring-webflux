@@ -1,43 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
-    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
     <springProperty scope="context" name="application_name" source="spring.application.name"/>
 
-    <logger name="com.bootlabs.logging" level="DEBUG" />
-    <logger name="org.springframework" level="ERROR" />
-    <logger name="org.springframework.web.reactive" level="ERROR" />
-    <!-- Ajout de logbook dans les logs -->
-    <logger name="org.zalando.logbook" level="TRACE" />
+    <logger name="com.bootlabs.logging" level="DEBUG"/>
+    <logger name="org.springframework" level="ERROR"/>
+    <logger name="org.springframework.web.reactive" level="ERROR"/>
+    <!-- Adding logbook in logs -->
+    <logger name="org.zalando.logbook" level="TRACE"/>
 
     <variable name="LOG_LOCATION" value="./logs"/>
 
-    <springProfile name="default">
-        <appender name="file-appender"
-                  class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>${LOG_LOCATION}/${application_name}.log</file>
-            <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
-            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <!-- daily rollover -->
-                <fileNamePattern>${LOG_LOCATION}/archived/${application_name}.%d{yyyy-MM-dd}.log</fileNamePattern>
-                <!-- each file should be at most 10MB, keep 60 days worth of history, but at most 1GB -->
-                <maxHistory>60</maxHistory>
-                <maxFileSize>10MB</maxFileSize>
-                <totalSizeCap>1GB</totalSizeCap>
-            </rollingPolicy>
-        </appender>
-        <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
-            <layout class="ch.qos.logback.classic.PatternLayout">
-                <Pattern>
-                    %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C): %msg%n%throwable
-                </Pattern>
-            </layout>
-        </appender>
-        <root level="info">
-            <appender-ref ref="file-appender"/>
-            <appender-ref ref="console"/>
-        </root>
-    </springProfile>
+    <appender name="file-appender"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_LOCATION}/${application_name}.log</file>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${LOG_LOCATION}/archived/${application_name}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- each file should be at most 10MB, keep 60 days worth of history, but at most 1GB -->
+            <maxHistory>60</maxHistory>
+            <maxFileSize>10MB</maxFileSize>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C): %msg%n%throwable
+            </Pattern>
+        </layout>
+    </appender>
+    <root level="info">
+        <appender-ref ref="file-appender"/>
+        <appender-ref ref="console"/>
+    </root>
 </configuration>
