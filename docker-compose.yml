@@ -1,0 +1,71 @@
+version: "3.8"
+
+services:
+  api:
+    build: .
+    ports:
+      - '8080:8080'
+    container_name: webflux-api
+    restart: always
+    volumes:
+      - ./data/logs:/app/logs
+    networks:
+      - elk-network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
+    ports:
+      - 9200:9200
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    networks:
+      - elk-network
+    healthcheck:
+      test: curl -s http://localhost:9200 >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 50
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.14.3
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    ports:
+      - 5601:5601
+    environment:
+      - SERVERNAME=kibana
+      - SERVER_NAME=kibana
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    networks:
+      - elk-network
+    healthcheck:
+      test: curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'
+      interval: 30s
+      timeout: 10s
+      retries: 50
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.14.3
+    depends_on:
+      kibana:
+        condition: service_healthy
+    #user: root
+    volumes:
+      - "./data:/usr/share/logstash/app_webflux_logs/"
+      - "./docker/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
+    networks:
+      - elk-network
+    environment:
+      - xpack.monitoring.enabled=false
+      - ELASTIC_HOSTS=http://elasticsearch:9200
+
+volumes:
+  data:
+    driver: local
+
+networks:
+  elk-network:
+    driver: bridge

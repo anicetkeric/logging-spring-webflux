@@ -18,3 +18,60 @@ management:
     export:
       atlas:
         enabled: false
+
+
+logbook:
+  exclude:
+    - /auditevents
+    - /beans
+    - /conditions
+    - /configprops
+    - /env
+    - /flyway
+    - /heapdump
+    - /**/actuator/**/*
+    - /**/actuator/*
+    - /actuator/**/*
+    - /actuator/*
+    - /liquibase
+    - /logfile
+    - /loggers
+    - /metrics
+    - /prometheus
+    - /scheduledtasks
+    - /sessions
+    - /shutdown
+    - /threaddump
+    - /trace
+    - /mappings
+    - /**/swagger*
+    - /**/v2/api-docs
+    - /**/configuration/ui/**/*
+    - /**/swagger-resources*/**/*
+    - /**/configuration/security*/**/*
+    - /**/swagger-ui.html
+    - /**/webjars/**
+    - /**/swagger-ui/*
+    - /**/swagger-ui/**
+    - /**/api-docs
+  filter.enabled: true
+  format.style: json
+  obfuscate:
+    headers:
+      - Authorization
+      - X-Secret
+      - senha
+    parameters:
+      - access_token
+      - open_id
+      - id_token
+      - tokenAcesso
+      - senha
+      - password
+      - refreshToken
+      - refresh_token
+      - accessToken
+  write:
+    category: http.wire-log
+    level: INFO
+  minimum-status: 200
